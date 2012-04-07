@@ -1,0 +1,13 @@
+(c) Yaculak and Stevens Co., 2011
+ @  Nick Yaculak and Michael Stevens
+ License under the GNU General Public License 3
+ Hosted at http://github.com:erhs-53-hackers/pyballs/Astreroid-Colliders
+ 
+
+--Dependencies--
+
+Python 3.2: http://www.python.org/ftp/python/3.2.2/python-3.2.2.msi
+
+Pygame 1.9.2a0: http://pygame.org/ftp/pygame-1.9.2a0.win32-py3.2.msi 
+
+Numpy  3.2: http://sourceforge.net/projects/numpy/files/NumPy/1.6.1/numpy-1.6.1-win32-superpack-python3.2.exe/download
