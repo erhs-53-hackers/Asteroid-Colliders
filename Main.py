@@ -29,8 +29,10 @@ RED = (255, 0, 0)
 
 # set up the block data structure
 livesImage = pygame.transform.smoothscale(pygame.image.load('res/image/player.png'), [45,45])
-    
-player = Player((WINDOWWIDTH/2) - (64/2), WINDOWHEIGHT - 64, 64, 64, 8)
+
+MOVESPEED = 10
+ 
+player = Player(MOVESPEED, size, 64, 64, 8)
 
 asteroids = []
 asteroidCounter = 0
@@ -51,7 +53,7 @@ isMoveRight = False
 isMoveUp = False
 isMoveDown = False
 
-MOVESPEED = 10
+
 oneThird = 1/3
 
 # set up music
@@ -65,18 +67,7 @@ laserBar = ProgressBar(5, 5, 200, 5, [255,0,0])
 shieldBar = ProgressBar(5, 15, 200, 5, [0,0,255])
 healthBar = ProgressBar(5, 25, 200, 5, [0, 255, 0])
 
-def moveUp():
-    if isMoveUp and player.y > 0:
-        player.y -= MOVESPEED
-def moveDown():
-    if isMoveDown and player.y + player.height < WINDOWHEIGHT:
-        player.y += MOVESPEED
-def moveLeft():
-    if isMoveLeft and player.x > 0:
-        player.x -= MOVESPEED    
-def moveRight():
-    if isMoveRight and player.x + player.width < WINDOWWIDTH:
-        player.x += MOVESPEED
+
         
 def checkQuit(event):
     if event.type == QUIT:
@@ -109,12 +100,6 @@ def addLaser():
         lasers.append(laser)
         laserSound.play()
                 
-def move():
-    moveUp()
-    moveDown()
-    moveLeft()
-    moveRight()
-    
 playGame = 0
 
 def showControls():
@@ -233,17 +218,13 @@ while playGame == 1:
         if event.type == KEYDOWN:
             # change the keyboard variables
             if event.key == K_LEFT or event.key == ord('a'):
-                isMoveRight = False
-                isMoveLeft = True
+                player.moveLeft(True)
             if event.key == K_RIGHT or event.key == ord('d'):
-                isMoveLeft = False
-                isMoveRight = True
+                player.moveRight(True)
             if event.key == K_UP or event.key == ord('w'):
-                isMoveDown = False
-                isMoveUp = True
+                player.moveUp(True)
             if event.key == K_DOWN or event.key == ord('s'):
-                isMoveUp = False
-                isMoveDown = True
+                player.moveDown(True)
             if event.key == ord('f'):
                 addLaser()
             if event.key == ord('p'):
@@ -258,13 +239,13 @@ while playGame == 1:
                 pygame.quit()
                 sys.exit()
             if event.key == K_LEFT or event.key == ord('a'):
-                isMoveLeft = False
+                player.moveLeft(False)                
             if event.key == K_RIGHT or event.key == ord('d'):
-                isMoveRight = False
+                player.moveRight(False)
             if event.key == K_UP or event.key == ord('w'):
-                isMoveUp = False
+                player.moveUp(False)
             if event.key == K_DOWN or event.key == ord('s'):
-                isMoveDown = False
+                player.moveDown(False)
             if event.key == ord('m'):
                 if musicPlaying:
                     pygame.mixer.music.stop()
@@ -273,14 +254,7 @@ while playGame == 1:
                 musicPlaying = not musicPlaying
     
     addAstroid()   
-    windowSurface.fill(BLACK)
-
-    # move the player
-    if(player.lives > 0):
-        move()
-
-
-    
+    windowSurface.fill(BLACK)    
 
     # check if the block has intersected with any asteroid squares.
     for asteroid in asteroids:
@@ -328,7 +302,7 @@ while playGame == 1:
         ScoreTimer = 0
     
     if Timer > 500:
-        NEWASTEROID = NEWASTEROID / 1.2
+        NEWASTEROID /= 1.2
         CYCLECOUNTER += 1
         Timer = 0
     
@@ -349,7 +323,7 @@ while playGame == 1:
         intlaserCounter = int(laserCounter)
         totalLasers = 30 - intlaserCounter
         strtotalLasers = str(totalLasers)
-        print('You have ' + strtotalLasers + ' lasers remaining')
+        #print('You have ' + strtotalLasers + ' lasers remaining')
         
     laserBar.update((30 - laserCounter)/30)
     laserBar.draw(windowSurface)
@@ -362,21 +336,21 @@ while playGame == 1:
     
     if player.lives <= 0:
         player.explode()
-        print('Game Over!')
+        #print('Game Over!')
         if player.sprite.done:
             quit()
         
     if player.lives > 0:
         strlives = str(player.lives)
-        print('You have ' + strlives + ' lives remaining')
+        #print('You have ' + strlives + ' lives remaining')
     
     shieldLife = player.shield
     strshieldLife = str(shieldLife)
-    print('You have ' + strshieldLife + ' counts remaining of shield')
+    #print('You have ' + strshieldLife + ' counts remaining of shield')
     
     strCYCLECOUNTER = str(CYCLECOUNTER)
-    print('Cycle Number:  ' + strCYCLECOUNTER)
-    print()
+    #print('Cycle Number:  ' + strCYCLECOUNTER)
+    #print()
 
     head = pygame.font.Font(None, 20)
     #score = round(pygame.time.get_ticks()/1000)
