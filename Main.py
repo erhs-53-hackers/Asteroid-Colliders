@@ -1,8 +1,7 @@
 ''' Asteroid Colliders
- - (c) Yaculak & Stevens Co., 2011
  - @ authors Nick Yaculak & Michael Stevens
- - @ contributer Coleman Tolliver
- - Released under the GNU General Public License 3'''
+ - Released under the GNU General Public License 3
+ '''
  
 import pygame, sys, time, random
 from pygame.locals import *
@@ -53,7 +52,6 @@ isMoveRight = False
 isMoveUp = False
 isMoveDown = False
 
-
 oneThird = 1/3
 
 # set up music
@@ -66,8 +64,6 @@ musicPlaying = True
 laserBar = ProgressBar(5, 5, 200, 5, [255,0,0])
 shieldBar = ProgressBar(5, 15, 200, 5, [0,0,255])
 healthBar = ProgressBar(5, 25, 200, 5, [0, 255, 0])
-
-
         
 def checkQuit(event):
     if event.type == QUIT:
@@ -77,7 +73,7 @@ def quit():
     pygame.quit()
     sys.exit()
         
-def addAstroid():
+def addAsteroid():
     global asteroidCounter
     global WINDOWWIDTH
     asteroidCounter += 1
@@ -89,9 +85,7 @@ def addAstroid():
 def addLaser():
     global laserCounter
     global player
-    
     laser = Laser(20, player.x, player.y, 15, 82, 10)
-    
     
     if laserCounter < 30:
         laserCounter += 1
@@ -155,7 +149,6 @@ def pauseMenu():
         choose = dm.dumbmenu(screen, [
                             'Resume Game',
                             'Quit Game'], 64, 64, None, 32, 1.4, GREEN, GREEN)
-
         if choose == 0:
             print('Resuming Game!')
             global playGame
@@ -181,7 +174,6 @@ def mainMenu():
                             'Highscores',
                             'Quit Game',
                             'Toggle Music'], 375, 400, None, 32, 1.4, GREEN, GREEN, True)
-
         if choose == 0:
             print('Starting Game!')
             global playGame
@@ -206,13 +198,10 @@ def mainMenu():
                 pygame.mixer.music.play(-1, 0.0)
             musicPlaying = not musicPlaying
 
-
 mainMenu()
-print ("Hello")
+
 # run the game loop
 while playGame == 1:
-    
-    # check for the QUIT event
     for event in pygame.event.get():
         checkQuit(event)
         if event.type == KEYDOWN:
@@ -253,77 +242,72 @@ while playGame == 1:
                     pygame.mixer.music.play(-1, 0.0)
                 musicPlaying = not musicPlaying
     
-    addAstroid()   
     windowSurface.fill(BLACK)    
 
-    # check if the block has intersected with any asteroid squares.
-    for asteroid in asteroids:
-        c = False
-        if player.isShield:
-            c = collide(player.shield, asteroid)
-        else:
-            c = collide(player, asteroid)
-            
-        if c:
-            asteroids.remove(asteroid)
-            if not player.isShield:
-                player.lives -= 1;
-            if musicPlaying:
-                kaboomSound.play()
-       
-                
-    
+    # if player has lives remaining, draw player
+	# else, make him explode upon impact
+    if player.lives > 0:
+        player.update(pygame.time.get_ticks())
+        player.draw(windowSurface)
+    else:
+        player.explode()
+        if player.sprite.done:
+            quit()
 
+    # draw the asteroids
+    addAsteroid()   
+    for asteroid in asteroids:
+        asteroid.update(pygame.time.get_ticks())
+        asteroid.draw(windowSurface)
+
+    # draw the lasers
+    for laser in lasers:
+        laser.draw(windowSurface)
+        laser.update(pygame.time.get_ticks())
+
+    # check if a laser collides with an asteroid
     for laser in lasers:
         for asteroid in asteroids:
             if(collide(laser, asteroid)):
                 #lasers.remove(laser)
                 asteroids.remove(asteroid)
                 kaboomSound.play()
-                
         if laser.y < 0 - laser.height:
             lasers.remove(laser)
 
-    # draw the asteroid
+	# check if the player has collided with an asteroid
     for asteroid in asteroids:
-        asteroid.update(pygame.time.get_ticks())
-        asteroid.draw(windowSurface)
+        c = False
+        if player.isShield:
+            c = collide(player.shield, asteroid)
+        else:
+            c = collide(player, asteroid)
+        if c:
+            asteroids.remove(asteroid)
+            if not player.isShield:
+                player.lives -= 1;
+            if musicPlaying:
+                kaboomSound.play()
 
-    for laser in lasers:
-        laser.draw(windowSurface)
-        laser.update(pygame.time.get_ticks())
-        
     Timer += 1
-    
-    ScoreTimer += 1
-    
-    if ScoreTimer > 50:
-        Score += 1
-        ScoreTimer = 0
-    
     if Timer > 500:
         NEWASTEROID /= 1.2
         CYCLECOUNTER += 1
         Timer = 0
     
     laserTimer += 1
-        
     if laserTimer > 500 and laserCounter != 0:
         laserCounter -= 1
         laserTimer = 0
 
-    #draw lives
+    ScoreTimer += 1
+    if ScoreTimer > 50:
+        Score += 1
+        ScoreTimer = 0
+
+    #draw lives and other player information bars
     for life in range(0, player.lives):
         windowSurface.blit(livesImage, [livesImage.get_height()*life, WINDOWHEIGHT - livesImage.get_height()])
-
-    #draw info
-    if laserCounter < 30:
-        
-        #pygame.draw.rect(windowSurface, (255, 0, 0), (5, 5, 200 - (200*laserCounter/30), 5))
-        intlaserCounter = int(laserCounter)
-        totalLasers = 30 - intlaserCounter
-        strtotalLasers = str(totalLasers)
-        #print('You have ' + strtotalLasers + ' lasers remaining')
         
     laserBar.update((30 - laserCounter)/30)
     laserBar.draw(windowSurface)
@@ -333,32 +317,11 @@ while playGame == 1:
         
     healthBar.update(player.lives / 3)
     healthBar.draw(windowSurface)
-    
-    if player.lives <= 0:
-        player.explode()
-        #print('Game Over!')
-        if player.sprite.done:
-            quit()
-        
-    if player.lives > 0:
-        strlives = str(player.lives)
-        #print('You have ' + strlives + ' lives remaining')
-    
-    shieldLife = player.shield
-    strshieldLife = str(shieldLife)
-    #print('You have ' + strshieldLife + ' counts remaining of shield')
-    
-    strCYCLECOUNTER = str(CYCLECOUNTER)
-    #print('Cycle Number:  ' + strCYCLECOUNTER)
-    #print()
 
     head = pygame.font.Font(None, 20)
-    #score = round(pygame.time.get_ticks()/1000)
     text = head.render("Score: " + str(Score), True, [255,255,255])
     windowSurface.blit(text, [30, 50])
 
     # draw the window onto the screen
-    player.update(pygame.time.get_ticks())
-    player.draw(windowSurface)
     pygame.display.update()
     mainClock.tick(40)
