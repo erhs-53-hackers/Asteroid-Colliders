@@ -244,12 +244,11 @@ while playGame == 1:
     
     windowSurface.fill(BLACK)    
 
-    # if player has lives remaining, draw player
-	# else, make him explode upon impact
-    if player.lives > 0:
-        player.update(pygame.time.get_ticks())
-        player.draw(windowSurface)
-    else:
+    # draw the player
+    player.update(pygame.time.get_ticks())
+    player.draw(windowSurface)
+	#make the player explode if he dies
+    if player.lives <= 0:
         player.explode()
         if player.sprite.done:
             quit()
